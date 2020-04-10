@@ -17,6 +17,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import { connect } from "react-redux";
 import Form1 from "./Form1";
 import Form2 from "./Form2";
 import { isEmpty } from "../helpers";
@@ -104,7 +105,7 @@ class FormContainer extends Component {
       value: 0,
     },
     state: {
-      value: "",
+      value: "Andaman Nicobar",
       focused: false,
     },
     district: {
@@ -176,7 +177,7 @@ class FormContainer extends Component {
       focused: false,
     },
     nativeState: {
-      value: "",
+      value: "Andaman Nicobar",
       focused: false,
     },
     haveBank: {
@@ -203,8 +204,6 @@ class FormContainer extends Component {
       value: "",
       focused: false,
     },
-    error: false,
-    success: false,
   };
 
   removeError = () => {
@@ -220,15 +219,11 @@ class FormContainer extends Component {
   };
 
   removeSuccess = () => {
-    this.setState({
-      success: false,
-    });
+    // call action
   };
 
   setSuccess = () => {
-    this.setState({
-      success: true,
-    });
+    // call action
   };
 
   handleSubmit = () => {
@@ -284,11 +279,11 @@ class FormContainer extends Component {
           focused: true,
         },
         nativeState: {
-          ...this.state.age,
+          ...this.state.nativeState,
           focused: true,
         },
         accNo: {
-          ...this.state.age,
+          ...this.state.accNo,
           focused: true,
         },
         ifsc: {
@@ -441,6 +436,29 @@ class FormContainer extends Component {
   };
 
   handleInputChange = (field, val) => {
+    if (field === "state") {
+      this.setState({
+        state: {
+          focused: true,
+          value: val,
+        },
+        district: {
+          value: "",
+          focused: true,
+        },
+      });
+    } else if (field === "nativeState") {
+      this.setState({
+        nativeState: {
+          focused: true,
+          value: val,
+        },
+        nativeDistrict: {
+          value: "",
+          focused: true,
+        },
+      });
+    }
     this.setState({
       [field]: {
         focused: true,
@@ -459,7 +477,7 @@ class FormContainer extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, ui } = this.props;
     const typeMap = [
       "RELIEF CAMPS/SHELTER (Dist wise)",
       "EMPLOYERS WHOSE LABOUR IS IN-SITU",
@@ -493,8 +511,6 @@ class FormContainer extends Component {
       aadhaar,
       otherSector,
       otherOccupation,
-      error,
-      success,
     } = this.state;
     const Form1Data = {
       state,
@@ -537,7 +553,7 @@ class FormContainer extends Component {
             </Typography>
           </Toolbar>
         </AppBar> */}
-        <Collapse style={{ marginBottom: 10 }} in={error} className="alert">
+        <Collapse style={{ marginBottom: 10 }} in={ui.error} className="alert">
           <Alert
             severity={"error"}
             action={
@@ -551,11 +567,11 @@ class FormContainer extends Component {
               </IconButton>
             }
           >
-            Something Went Wrong
+            {ui.errorMessage || "Something Went Wrong"}
           </Alert>
         </Collapse>
         <Dialog
-          open={success}
+          open={ui.success}
           onClose={this.removeSuccess}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
@@ -631,4 +647,10 @@ class FormContainer extends Component {
   }
 }
 
-export default withStyles(styles)(FormContainer);
+const mapStateToProps = (state) => {
+  return {
+    ui: state.ui,
+  };
+};
+
+export default connect(mapStateToProps)(withStyles(styles)(FormContainer));

@@ -6,7 +6,7 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import { isEmpty } from "../helpers";
+import { isEmpty, getStates, getDistrict } from "../helpers";
 
 export default function AddressForm(props) {
   const { data } = props;
@@ -166,36 +166,50 @@ export default function AddressForm(props) {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            id="nativeDistrict"
-            name="nativeDistrict"
-            label="Native District"
-            fullWidth
-            onChange={(event) =>
-              props.handleInputChange("nativeDistrict", event.target.value)
-            }
-            value={data.nativeDistrict.value}
-            onFocus={() => props.setFocus("nativeDistrict")}
-            error={
-              data.nativeDistrict.focused && isEmpty(data.nativeDistrict.value)
-            }
-          />
+          <FormControl style={{ minWidth: "100%" }}>
+            <InputLabel id="nativeState">Native State</InputLabel>
+            <Select
+              labelId="nativeState"
+              id="nativeState"
+              value={data.nativeState.value}
+              onChange={(event) =>
+                props.handleInputChange("nativeState", event.target.value)
+              }
+            >
+              {getStates().map((s, i) => {
+                return (
+                  <MenuItem value={s} key={s + i}>
+                    {s}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            id="nativeState"
-            name="nativeState"
-            label="Native State"
-            fullWidth
-            onChange={(event) =>
-              props.handleInputChange("nativeState", event.target.value)
-            }
-            value={data.nativeState.value}
-            onFocus={() => props.setFocus("nativeState")}
-            error={data.nativeState.focused && isEmpty(data.nativeState.value)}
-          />
+          <FormControl style={{ minWidth: "100%" }}>
+            <InputLabel id="nativeDistrict">Native District</InputLabel>
+            <Select
+              error={
+                isEmpty(data.nativeDistrict.value) &&
+                data.nativeDistrict.focused
+              }
+              labelId="nativeDistrict"
+              id="nativeDistrict"
+              value={data.nativeDistrict.value}
+              onChange={(event) =>
+                props.handleInputChange("nativeDistrict", event.target.value)
+              }
+            >
+              {getDistrict(data.nativeState.value).map((s, i) => {
+                return (
+                  <MenuItem value={s} key={s + i}>
+                    {s}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
           <FormControl style={{ minWidth: "100%" }}>
