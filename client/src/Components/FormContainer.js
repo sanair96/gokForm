@@ -18,17 +18,25 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { connect } from "react-redux";
+import Logo from "../images/LabourDept.jpg";
 import Form1 from "./Form1";
 import Form2 from "./Form2";
 import { isEmpty } from "../helpers";
 import axios from "axios";
+import {
+  setError,
+  removeError,
+  uiStartLoading,
+  uiStopLoading,
+} from "../Store/Actions/UiActions";
+import { CircularProgress } from "@material-ui/core";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://wurkwell.com">
-        wurkwell.com
+      <Link color="inherit" href="#">
+        Labour Institute (Govt. of Karnataka)
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -74,6 +82,12 @@ const styles = (theme) => ({
 });
 
 const steps = ["Select Category", "Add Information"];
+
+const typeMap = [
+  "RELIEF CAMPS/SHELTER (Dist wise)",
+  "EMPLOYERS WHOSE LABOUR IS IN-SITU",
+  "LOCALITIES WHERE MIGRANT WORKERS ARE CLUSTERED",
+];
 
 function getStepContent(step, data, handleInputChange, onFocus) {
   switch (step) {
@@ -136,10 +150,6 @@ class FormContainer extends Component {
       value: "",
       focused: false,
     },
-    otherOccupation: {
-      value: "",
-      focused: false,
-    },
     locality: {
       value: "",
       focused: false,
@@ -162,6 +172,10 @@ class FormContainer extends Component {
     },
     occupation: {
       value: "Agriculture",
+      focused: false,
+    },
+    otherOccupation: {
+      value: "",
       focused: false,
     },
     mobile: {
@@ -204,35 +218,34 @@ class FormContainer extends Component {
       value: "",
       focused: false,
     },
-  };
-
-  removeError = () => {
-    this.setState({
-      error: false,
-    });
-  };
-
-  setError = () => {
-    this.setState({
-      error: true,
-    });
+    success: false,
   };
 
   removeSuccess = () => {
-    // call action
-  };
-
-  setSuccess = () => {
-    // call action
+    this.setState({
+      success: false,
+    });
   };
 
   handleSubmit = () => {
     console.log("submit");
     const {
+      type,
+      state,
+      district,
+      campName,
+      runBy,
+      facilities,
+      employerName,
+      sector,
+      otherSector,
+      locality,
+      address,
       name,
       age,
       gender,
       occupation,
+      otherOccupation,
       mobile,
       lastAddress,
       nativeDistrict,
@@ -243,7 +256,6 @@ class FormContainer extends Component {
       ifsc,
       ujjwala,
       aadhaar,
-      otherOccupation,
     } = this.state;
     if (
       isEmpty(name.value) ||
@@ -293,24 +305,236 @@ class FormContainer extends Component {
       });
       return;
     }
+    let data = {};
+    data.type = typeMap[type.value];
+    data.facilities = facilities.value;
+    data.state = state.value;
+    data.district = district.value;
+    data.name = name.value;
+    data.age = age.value;
+    data.gender = gender.value;
+    data.mobile = mobile.value;
+    data.occupation =
+      occupation.value === "Others (Specify)"
+        ? otherOccupation.value
+        : occupation.value;
+    data.lastAddress = lastAddress.value;
+    data.nativeState = nativeState.value;
+    data.nativeDistrict = nativeDistrict.value;
+    data.haveBank = haveBank.value;
+    if (haveBank.value === "Y") {
+      data.accNo = accNo.value;
+      data.ifsc = ifsc.value;
+    }
+    data.haveJandhan = haveJandhan.value;
+    data.ujjwala = ujjwala.value;
+    data.aadhaar = aadhaar.value;
+    if (type.value === 0) {
+      data.campName = campName.value;
+      data.runBy = runBy.value;
+    } else if (type.value === 1) {
+      data.employerName = employerName.value;
+      data.sector =
+        sector.value === "Others (Specify)" ? otherSector.value : sector.value;
+    } else {
+      data.locality = locality.value;
+      data.address = address.value;
+    }
+    this.props.uiStartLoading();
+    this.props.removeError();
     axios
-      .get(
-        "https://script.google.com/macros/s/AKfycbyPi6dBLxshnYWff4DLyXMtH5GHF64kwVYljokjThKAffADRgDM/exec",
-        {
-          hello: "hey",
-          hello1: "how",
-        }
-      )
+      .post("/data/addMigrant", data)
       .then((resp) => {
+        this.props.uiStopLoading();
+        this.setState((prevState) => {
+          return {
+            activeStep: prevState.activeStep + 1,
+            success: true,
+          };
+        });
         console.log(resp.data);
       })
       .catch((err) => {
+        this.props.uiStopLoading();
+        this.props.setError("Something went wrong");
         console.log(err);
       });
-    this.setState((prevState) => {
-      return {
-        activeStep: prevState.activeStep + 1,
-      };
+  };
+
+  submitSame = () => {
+    this.setState({
+      activeStep: 1,
+      name: {
+        value: "",
+        focused: false,
+      },
+      age: {
+        value: "",
+        focused: false,
+      },
+      gender: {
+        value: "M",
+        focused: false,
+      },
+      occupation: {
+        value: "Agriculture",
+        focused: false,
+      },
+      otherOccupation: {
+        value: "",
+        focused: false,
+      },
+      mobile: {
+        value: "",
+        focused: false,
+      },
+      lastAddress: {
+        value: "",
+        focused: false,
+      },
+      nativeDistrict: {
+        value: "",
+        focused: false,
+      },
+      nativeState: {
+        value: "Andaman Nicobar",
+        focused: false,
+      },
+      haveBank: {
+        value: "N",
+        focused: false,
+      },
+      haveJandhan: {
+        value: "N",
+        focused: false,
+      },
+      accNo: {
+        value: "",
+        focused: false,
+      },
+      ifsc: {
+        value: "",
+        focused: false,
+      },
+      ujjwala: {
+        value: "N",
+        focused: false,
+      },
+      aadhaar: {
+        value: "",
+        focused: false,
+      },
+      success: false,
+    });
+  };
+
+  submitNew = () => {
+    this.setState({
+      activeStep: 0,
+      type: {
+        value: 0,
+      },
+      state: {
+        value: "Andaman Nicobar",
+        focused: false,
+      },
+      district: {
+        value: "",
+        focused: false,
+      },
+      campName: {
+        value: "",
+        focused: false,
+      },
+      runBy: {
+        value: "Govt",
+        focused: false,
+      },
+      facilities: {
+        value: "",
+        focused: false,
+      },
+      employerName: {
+        value: "",
+        focused: false,
+      },
+      sector: {
+        value: "Building and Construction",
+        focused: false,
+      },
+      otherSector: {
+        value: "",
+        focused: false,
+      },
+      locality: {
+        value: "",
+        focused: false,
+      },
+      address: {
+        value: "",
+        focused: false,
+      },
+      name: {
+        value: "",
+        focused: false,
+      },
+      age: {
+        value: "",
+        focused: false,
+      },
+      gender: {
+        value: "M",
+        focused: false,
+      },
+      occupation: {
+        value: "Agriculture",
+        focused: false,
+      },
+      otherOccupation: {
+        value: "",
+        focused: false,
+      },
+      mobile: {
+        value: "",
+        focused: false,
+      },
+      lastAddress: {
+        value: "",
+        focused: false,
+      },
+      nativeDistrict: {
+        value: "",
+        focused: false,
+      },
+      nativeState: {
+        value: "Andaman Nicobar",
+        focused: false,
+      },
+      haveBank: {
+        value: "N",
+        focused: false,
+      },
+      haveJandhan: {
+        value: "N",
+        focused: false,
+      },
+      accNo: {
+        value: "",
+        focused: false,
+      },
+      ifsc: {
+        value: "",
+        focused: false,
+      },
+      ujjwala: {
+        value: "N",
+        focused: false,
+      },
+      aadhaar: {
+        value: "",
+        focused: false,
+      },
+      success: false,
     });
   };
 
@@ -321,7 +545,6 @@ class FormContainer extends Component {
       state,
       district,
       campName,
-      runBy,
       facilities,
       employerName,
       sector,
@@ -478,11 +701,6 @@ class FormContainer extends Component {
 
   render() {
     const { classes, ui } = this.props;
-    const typeMap = [
-      "RELIEF CAMPS/SHELTER (Dist wise)",
-      "EMPLOYERS WHOSE LABOUR IS IN-SITU",
-      "LOCALITIES WHERE MIGRANT WORKERS ARE CLUSTERED",
-    ];
     const {
       activeStep,
       state,
@@ -511,6 +729,7 @@ class FormContainer extends Component {
       aadhaar,
       otherSector,
       otherOccupation,
+      success,
     } = this.state;
     const Form1Data = {
       state,
@@ -546,13 +765,9 @@ class FormContainer extends Component {
     return (
       <React.Fragment>
         <CssBaseline />
-        {/* <AppBar position="absolute" color="default" className={classes.appBar}>
-          <Toolbar>
-            <Typography variant="h6" color="inherit" noWrap>
-              Company name
-            </Typography>
-          </Toolbar>
-        </AppBar> */}
+        <AppBar position="absolute" color="inherit" className={classes.appBar}>
+          <Toolbar style={{ justifyContent: "space-between" }}></Toolbar>
+        </AppBar>
         <Collapse style={{ marginBottom: 10 }} in={ui.error} className="alert">
           <Alert
             severity={"error"}
@@ -561,7 +776,7 @@ class FormContainer extends Component {
                 aria-label="close"
                 color="inherit"
                 size="small"
-                onClick={this.removeError}
+                onClick={this.props.removeError}
               >
                 <Close fontSize="inherit" />
               </IconButton>
@@ -571,7 +786,7 @@ class FormContainer extends Component {
           </Alert>
         </Collapse>
         <Dialog
-          open={ui.success}
+          open={success}
           onClose={this.removeSuccess}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
@@ -588,6 +803,20 @@ class FormContainer extends Component {
         </Dialog>
         <main className={classes.layout}>
           <Paper className={classes.paper}>
+            <div
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                display: "flex",
+                marginBottom: 5,
+              }}
+            >
+              <img
+                src={Logo}
+                style={{ maxHeight: 60, maxWidth: 160 }}
+                alt="TeleOPD"
+              />
+            </div>
             <Typography component="h1" variant="h4" align="center">
               Migrant Workers Information
             </Typography>
@@ -602,16 +831,39 @@ class FormContainer extends Component {
               {activeStep === steps.length ? (
                 <React.Fragment>
                   <Typography variant="h5" gutterBottom>
-                    Thank you for your order.
+                    Thank you.
                   </Typography>
                   <Typography variant="subtitle1">
-                    Your order number is #2001539. We have emailed your order
-                    confirmation, and will send you an update when your order
-                    has shipped.
+                    {`Data Submitted Successfully in ${
+                      typeMap[type.value]
+                    } category`}
                   </Typography>
+                  <div className={classes.buttons}>
+                    <Button
+                      onClick={this.submitSame}
+                      className={classes.button}
+                      variant="contained"
+                      color="primary"
+                    >
+                      Submit Again
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={this.submitNew}
+                      className={classes.button}
+                    >
+                      Submit New
+                    </Button>
+                  </div>
                 </React.Fragment>
               ) : (
                 <React.Fragment>
+                  {activeStep === 1 && (
+                    <Typography variant="caption" gutterBottom>
+                      {`category - ${typeMap[type.value]}`}
+                    </Typography>
+                  )}
                   {getStepContent(
                     activeStep,
                     data,
@@ -627,14 +879,18 @@ class FormContainer extends Component {
                         Back
                       </Button>
                     )}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={this.handleNext}
-                      className={classes.button}
-                    >
-                      {activeStep === steps.length - 1 ? "Submit" : "Next"}
-                    </Button>
+                    {ui.isLoading ? (
+                      <CircularProgress />
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={this.handleNext}
+                        className={classes.button}
+                      >
+                        {activeStep === steps.length - 1 ? "Submit" : "Next"}
+                      </Button>
+                    )}
                   </div>
                 </React.Fragment>
               )}
@@ -653,4 +909,16 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(FormContainer));
+const mapDispatchToProps = (dispatch) => {
+  return {
+    removeError: () => dispatch(removeError()),
+    setError: (error) => dispatch(setError(error)),
+    uiStartLoading: () => dispatch(uiStartLoading()),
+    uiStopLoading: () => dispatch(uiStopLoading()),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(FormContainer));
