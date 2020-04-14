@@ -23,15 +23,3 @@ export const removeError = () => {
     type: actionTypes.REMOVE_ERROR,
   };
 };
-
-export const setPasswordSuccess = () => {
-  return {
-    type: actionTypes.SET_PASSWORD_SUCCESS,
-  };
-};
-
-export const removePasswordSuccess = () => {
-  return {
-    type: actionTypes.REMOVE_PASSWORD_SUCCESS,
-  };
-};
