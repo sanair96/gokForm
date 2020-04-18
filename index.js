@@ -4,12 +4,14 @@ const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const dataRoutes = require("./routes/migrant");
+const authRoutes = require("./routes/auth");
 const path = require("path");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use("/data", dataRoutes);
+app.use("/auth", authRoutes);
 
 if (process.env.NODE_ENV === "production") {
   // set static folder
