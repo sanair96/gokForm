@@ -7,10 +7,12 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { isEmpty, getStates, getDistrict } from "../helpers";
+import Checkbox from "@material-ui/core/Checkbox";
+import ListItemText from "@material-ui/core/ListItemText";
 
 export default function AddressForm(props) {
   const { data } = props;
-  console.log(props);
+  console.log(data.facilities.value);
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -203,20 +205,61 @@ export default function AddressForm(props) {
         )}
         {(data.type.value === 0 || data.type.value === 1) && (
           <Grid item xs={12}>
-            <TextField
-              required
-              id="facilities"
-              name="facilities"
-              label="Facilities Provided"
-              multiline
-              fullWidth
-              onChange={(event) =>
-                props.handleInputChange("facilities", event.target.value)
-              }
-              value={data.facilities.value}
-              onFocus={() => props.setFocus("facilities")}
-              error={data.facilities.focused && isEmpty(data.facilities.value)}
-            />
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
+              <FormControl style={{ minWidth: "100%" }}>
+                <InputLabel id="facilities">facilities</InputLabel>
+                <Select
+                  labelId="facilities"
+                  id="facilities"
+                  value={data.facilities.value}
+                  renderValue={(selected) => selected.join(", ")}
+                  multiple
+                  onChange={(event) => {
+                    console.log(event.target.value);
+                    props.handleInputChange("facilities", event.target.value);
+                  }}
+                  error={data.facilities.value.length === 0}
+                >
+                  <MenuItem value="Cooked food">
+                    <Checkbox
+                      checked={
+                        data.facilities.value.indexOf("Cooked food") > -1
+                      }
+                    />
+                    <ListItemText primary="Cooked food" />
+                  </MenuItem>
+                  <MenuItem value="Dry Ration">
+                    <Checkbox
+                      checked={data.facilities.value.indexOf("Dry Ration") > -1}
+                    />
+                    <ListItemText primary="Dry Ration" />
+                  </MenuItem>
+                  <MenuItem value="Financial Assistance">
+                    <Checkbox
+                      checked={
+                        data.facilities.value.indexOf("Financial Assistance") >
+                        -1
+                      }
+                    />
+                    <ListItemText primary="Financial Assistance" />
+                  </MenuItem>
+                  <MenuItem value="Medical Assistance">
+                    <Checkbox
+                      checked={
+                        data.facilities.value.indexOf("Medical Assistance") > -1
+                      }
+                    />
+                    <ListItemText primary="Medical Assistance" />
+                  </MenuItem>
+                  <MenuItem value="Others">
+                    <Checkbox
+                      checked={data.facilities.value.indexOf("Others") > -1}
+                    />
+                    <ListItemText primary="Others" />
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </div>
           </Grid>
         )}
 

@@ -29,6 +29,7 @@ import {
   uiStartLoading,
   uiStopLoading,
 } from "../Store/Actions/UiActions";
+import { logoutUser } from "../Store/Actions/AuthActions";
 import { CircularProgress } from "@material-ui/core";
 
 function Copyright() {
@@ -135,6 +136,10 @@ class FormContainer extends Component {
       focused: false,
     },
     facilities: {
+      value: ["Cooked food"],
+      focused: false,
+    },
+    otherFacilities: {
       value: "",
       focused: false,
     },
@@ -307,7 +312,8 @@ class FormContainer extends Component {
     }
     let data = {};
     data.type = typeMap[type.value];
-    data.facilities = facilities.value;
+    data.facilities =
+      type.value === 0 || type.value === 1 ? facilities.value.join(", ") : "";
     data.state = state.value;
     data.district = district.value;
     data.name = name.value;
@@ -451,6 +457,10 @@ class FormContainer extends Component {
         focused: false,
       },
       facilities: {
+        value: ["Cooked food"],
+        focused: false,
+      },
+      otherFacilities: {
         value: "",
         focused: false,
       },
@@ -561,7 +571,7 @@ class FormContainer extends Component {
         isEmpty(state.value) ||
         isEmpty(district.value) ||
         isEmpty(campName.value) ||
-        isEmpty(facilities.value)
+        facilities.value.length === 0
       ) {
         this.setState({
           state: {
@@ -588,7 +598,7 @@ class FormContainer extends Component {
         isEmpty(state.value) ||
         isEmpty(district.value) ||
         isEmpty(employerName.value) ||
-        isEmpty(facilities.value) ||
+        facilities.value.length === 0 ||
         (sector.value === "Others (Specify)" && isEmpty(otherSector.value))
       ) {
         this.setState({
@@ -766,7 +776,17 @@ class FormContainer extends Component {
       <React.Fragment>
         <CssBaseline />
         <AppBar position="absolute" color="inherit" className={classes.appBar}>
-          <Toolbar style={{ justifyContent: "space-between" }}></Toolbar>
+          <Toolbar
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          >
+            <Button color="inherit" onClick={this.props.logoutUser}>
+              Logout
+            </Button>
+          </Toolbar>
         </AppBar>
         <Collapse style={{ marginBottom: 10 }} in={ui.error} className="alert">
           <Alert
@@ -915,6 +935,7 @@ const mapDispatchToProps = (dispatch) => {
     setError: (error) => dispatch(setError(error)),
     uiStartLoading: () => dispatch(uiStartLoading()),
     uiStopLoading: () => dispatch(uiStopLoading()),
+    logoutUser: () => dispatch(logoutUser()),
   };
 };
 

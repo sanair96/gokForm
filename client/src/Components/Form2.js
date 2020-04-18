@@ -93,9 +93,9 @@ export default function AddressForm(props) {
               labelId="occupation"
               id="occupation"
               value={data.occupation.value}
-              onChange={(event) =>
-                props.handleInputChange("occupation", event.target.value)
-              }
+              onChange={(event) => {
+                props.handleInputChange("occupation", event.target.value);
+              }}
             >
               <MenuItem value={"Agriculture"}>Agriculture</MenuItem>
               <MenuItem value={"Domestic Work"}>Domestic Work</MenuItem>
@@ -128,28 +128,28 @@ export default function AddressForm(props) {
               <MenuItem value={"Others (Specify)"}>Others (Specify)</MenuItem>
             </Select>
           </FormControl>
-          {data.occupation.value === "Others (Specify)" && (
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="otherOccupation"
-                name="otherOccupation"
-                label="Other Occupation"
-                multiline
-                fullWidth
-                onChange={(event) =>
-                  props.handleInputChange("otherOccupation", event.target.value)
-                }
-                value={data.otherOccupation.value}
-                onFocus={() => props.setFocus("otherOccupation")}
-                error={
-                  data.otherOccupation.focused &&
-                  isEmpty(data.otherOccupation.value)
-                }
-              />
-            </Grid>
-          )}
         </Grid>
+        {data.occupation.value === "Others (Specify)" && (
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              id="otherOccupation"
+              name="otherOccupation"
+              label="Other Occupation"
+              multiline
+              fullWidth
+              onChange={(event) =>
+                props.handleInputChange("otherOccupation", event.target.value)
+              }
+              value={data.otherOccupation.value}
+              onFocus={() => props.setFocus("otherOccupation")}
+              error={
+                data.otherOccupation.focused &&
+                isEmpty(data.otherOccupation.value)
+              }
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <TextField
             required
