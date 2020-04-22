@@ -4,8 +4,8 @@ const app = express();
 const bodyParser = require("body-parser");
 const Sequelize = require("sequelize");
 const Helmet = require("helmet");
-const sequelize = new Sequelize("gok", "root", "poiqwe123098", {
-  host: "localhost",
+const sequelize = new Sequelize(process.env.dbname, process.env.dbusername, process.env.dbpassword, {
+  host: process.env.hostname,
   dialect: "mysql",
 });
 
