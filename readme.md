@@ -1,6 +1,6 @@
 #GOK FORM
 
-####Steps to run:
+###Steps to run:
 
 1. Run `yarn prod` to create the tables, and stop the process
 2. Run `yarn client-build` to build client packages.
