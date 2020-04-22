@@ -6,11 +6,12 @@
   "author": "Anmol Malik <anmolmalik97new@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "client-install": "npm install --prefix client",
+    "client-build": "npm run build --prefix client",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
+    "prod-dev": "NODE_ENV=production node index.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
@@ -18,12 +19,17 @@
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "concurrently": "^5.1.0",
+    "csv-parser": "^2.3.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "helmet": "^3.22.0",
     "json2csv": "^5.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.9",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
     "node-persist": "^3.0.5",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sequelize": "^5.21.6"
   }
 }
