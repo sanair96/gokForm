@@ -31,6 +31,7 @@ import {
 } from "../Store/Actions/UiActions";
 import { logoutUser } from "../Store/Actions/AuthActions";
 import { CircularProgress } from "@material-ui/core";
+import Form0 from "./Form0";
 
 function Copyright() {
   return (
@@ -45,7 +46,7 @@ function Copyright() {
   );
 }
 
-const styles = (theme) => ({
+export const styles = (theme) => ({
   appBar: {
     position: "relative",
   },
@@ -82,7 +83,7 @@ const styles = (theme) => ({
   },
 });
 
-const steps = ["Select Category", "Add Information"];
+const steps = ["Select Group","Select Category", "Add Information"];
 
 const typeMap = [
   "RELIEF CAMPS/SHELTER (Dist wise)",
@@ -93,17 +94,24 @@ const typeMap = [
 function getStepContent(step, data, handleInputChange, onFocus) {
   switch (step) {
     case 0:
+      return(
+        <Form0 
+        data={data[0]}
+          handleInputChange={handleInputChange}
+        />
+      )
+    case 1:
       return (
         <Form1
-          data={data[0]}
+          data={data[1]}
           handleInputChange={handleInputChange}
           setFocus={onFocus}
         />
       );
-    case 1:
+    case 2:
       return (
         <Form2
-          data={data[1]}
+          data={data[2]}
           handleInputChange={handleInputChange}
           setFocus={onFocus}
         />
@@ -115,6 +123,8 @@ function getStepContent(step, data, handleInputChange, onFocus) {
 
 class FormContainer extends Component {
   state = {
+    error: false,
+    groupId: 0,
     activeStep: 0,
     type: {
       value: 0,
@@ -229,12 +239,14 @@ class FormContainer extends Component {
   removeSuccess = () => {
     this.setState({
       success: false,
+      error: false,
     });
   };
 
   handleSubmit = () => {
     console.log("submit");
     const {
+      groupId,
       type,
       state,
       district,
@@ -311,6 +323,7 @@ class FormContainer extends Component {
       return;
     }
     let data = {};
+    data.groupId = groupId
     data.type = typeMap[type.value];
     data.facilities =
       type.value === 0 || type.value === 1 ? facilities.value.join(", ") : "";
@@ -352,12 +365,19 @@ class FormContainer extends Component {
       .post("/data/addMigrant", data)
       .then((resp) => {
         this.props.uiStopLoading();
+        if (resp.data.success) {
         this.setState((prevState) => {
           return {
             activeStep: prevState.activeStep + 1,
             success: true,
           };
         });
+      } else {
+        this.setState((prevState) => ({
+          success: false,
+          error: true,
+        }))
+      }
         console.log(resp.data);
       })
       .catch((err) => {
@@ -437,53 +457,6 @@ class FormContainer extends Component {
   submitNew = () => {
     this.setState({
       activeStep: 0,
-      type: {
-        value: 0,
-      },
-      state: {
-        value: "Andaman Nicobar",
-        focused: false,
-      },
-      district: {
-        value: "",
-        focused: false,
-      },
-      campName: {
-        value: "",
-        focused: false,
-      },
-      runBy: {
-        value: "Govt",
-        focused: false,
-      },
-      facilities: {
-        value: ["Cooked food"],
-        focused: false,
-      },
-      otherFacilities: {
-        value: "",
-        focused: false,
-      },
-      employerName: {
-        value: "",
-        focused: false,
-      },
-      sector: {
-        value: "Building and Construction",
-        focused: false,
-      },
-      otherSector: {
-        value: "",
-        focused: false,
-      },
-      locality: {
-        value: "",
-        focused: false,
-      },
-      address: {
-        value: "",
-        focused: false,
-      },
       name: {
         value: "",
         focused: false,
@@ -516,10 +489,6 @@ class FormContainer extends Component {
         value: "",
         focused: false,
       },
-      nativeState: {
-        value: "Andaman Nicobar",
-        focused: false,
-      },
       haveBank: {
         value: "N",
         focused: false,
@@ -549,8 +518,9 @@ class FormContainer extends Component {
   };
 
   handleNext = () => {
-    console.log("next");
+
     const {
+      groupId,
       type,
       state,
       district,
@@ -560,9 +530,20 @@ class FormContainer extends Component {
       sector,
       locality,
       address,
+      activeStep,
       otherSector,
     } = this.state;
-    if (this.state.activeStep === 1) {
+    if(groupId === 0 && activeStep === 0) {
+      this.setState({
+        activeStep: 0,
+      })
+      return;
+    }
+    if(activeStep === 0) {
+      this.setState({activeStep: 1});
+    }
+
+    if (this.state.activeStep === 2) {
       this.handleSubmit();
       return;
     }
@@ -662,6 +643,12 @@ class FormContainer extends Component {
 
   handleBack = () => {
     this.setState((prevState) => {
+      if(prevState.activeStep === 1) {
+        return {
+          groupId: 0,
+          activeStep: prevState.activeStep - 1,
+        };
+      }
       return {
         activeStep: prevState.activeStep - 1,
       };
@@ -669,6 +656,12 @@ class FormContainer extends Component {
   };
 
   handleInputChange = (field, val) => {
+    if(field === "groupId") {
+      this.setState({
+        groupId: val,
+      });
+      return;
+    }
     if (field === "state") {
       this.setState({
         state: {
@@ -712,6 +705,7 @@ class FormContainer extends Component {
   render() {
     const { classes, ui } = this.props;
     const {
+      groupId,
       activeStep,
       state,
       district,
@@ -740,7 +734,11 @@ class FormContainer extends Component {
       otherSector,
       otherOccupation,
       success,
+      error
     } = this.state;
+    const Form0Data = {
+      groupId
+    }
     const Form1Data = {
       state,
       district,
@@ -771,7 +769,7 @@ class FormContainer extends Component {
       aadhaar,
       otherOccupation,
     };
-    const data = [Form1Data, form2Data];
+    const data = [Form0Data,Form1Data, form2Data];
     return (
       <React.Fragment>
         <CssBaseline />
@@ -783,6 +781,7 @@ class FormContainer extends Component {
               alignItems: "center",
             }}
           >
+            <Link href="/">Home</Link>
             <Button color="inherit" onClick={this.props.logoutUser}>
               Logout
             </Button>
@@ -806,13 +805,13 @@ class FormContainer extends Component {
           </Alert>
         </Collapse>
         <Dialog
-          open={success}
+          open={success || error}
           onClose={this.removeSuccess}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            {"Data Submitted Successfully"}
+            {error ? "Error Submitting data" : "Data Submitted Successfully"}
           </DialogTitle>
 
           <DialogActions>
@@ -879,7 +878,7 @@ class FormContainer extends Component {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  {activeStep === 1 && (
+                  {activeStep === 2 && (
                     <Typography variant="caption" gutterBottom>
                       {`category - ${typeMap[type.value]}`}
                     </Typography>
@@ -891,7 +890,7 @@ class FormContainer extends Component {
                     this.setFocus
                   )}
                   <div className={classes.buttons}>
-                    {activeStep !== 0 && (
+                    {activeStep !== 0  && (
                       <Button
                         onClick={this.handleBack}
                         className={classes.button}
@@ -905,6 +904,7 @@ class FormContainer extends Component {
                       <Button
                         variant="contained"
                         color="primary"
+                        disabled={groupId === 0}
                         onClick={this.handleNext}
                         className={classes.button}
                       >

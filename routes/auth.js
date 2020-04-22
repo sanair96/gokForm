@@ -35,7 +35,7 @@ router.post("/generateOtp", (req, res) => {
 router.post("/validate", async (req, res) => {
   await storage.init();
   const otp = await storage.getItem(req.body.mobile);
-  if (otp == req.body.otp) {
+  if (otp === req.body.otp) {
     jwt.sign(
       { mobile: req.body.mobile },
       "m16@Health",
@@ -51,5 +51,13 @@ router.post("/validate", async (req, res) => {
     res.json({ success: false, msg: "incorrect or expired otp" });
   }
 });
+
+router.post("/verify", async (req, res) => {
+  if(jwt.verify(req.headers.authorization)) {
+    res.send({success: true, msg:"valid jwt"});
+  } else {
+    res.send({success: false, msg: "jwt expired"})
+  }
+})
 
 module.exports = router;

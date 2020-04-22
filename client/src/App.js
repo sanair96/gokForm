@@ -1,15 +1,17 @@
-import React from "react";
-import FormContainer from "./Components/FormContainer";
-import Login from "./Components/Login";
-import ValidateOtp from "./Components/ValidateOtp";
-import PrivateRoute from "./Components/PrivateRoute";
-import { Router, Route } from "react-router-dom";
-import { Provider } from "react-redux";
 import { createBrowserHistory } from "history";
-import { setCurrentUser, logoutUser } from "./Store/Actions/AuthActions";
 import jwt_decode from "jwt-decode";
-import store from "./Store";
+import React from "react";
+import { Provider } from "react-redux";
+import { Route, Router } from "react-router-dom";
 import "./App.css";
+import AvailableForms from "./Components/AvailableForms";
+import FormContainer from "./Components/FormContainer";
+import HeatMapForm from './Components/heatmapForm';
+import Login from "./Components/Login";
+import PrivateRoute from "./Components/PrivateRoute";
+import ValidateOtp from "./Components/ValidateOtp";
+import store from "./Store";
+import { logoutUser, setCurrentUser } from "./Store/Actions/AuthActions";
 
 export const history = createBrowserHistory();
 
@@ -32,7 +34,11 @@ function App() {
   return (
     <Provider store={store}>
       <Router history={history}>
-        <PrivateRoute exact path="/" component={FormContainer} />
+        <PrivateRoute exact path="/">
+          <AvailableForms />
+        </PrivateRoute>
+        <PrivateRoute exact path="/individualdata" component={FormContainer} />
+        <PrivateRoute exact path='/groupdata' component={HeatMapForm}/>
         <Route exact path="/login" component={Login} />
         <Route exact path="/validate" component={ValidateOtp} />
       </Router>

@@ -2,11 +2,18 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
+const Sequelize = require("sequelize");
+const Helmet = require("helmet");
+const sequelize = new Sequelize("gok", "root", "poiqwe123098", {
+  host: "localhost",
+  dialect: "mysql",
+});
+
 const dataRoutes = require("./routes/migrant");
 const authRoutes = require("./routes/auth");
 const path = require("path");
 
+app.use(Helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -21,14 +28,11 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+sequelize
+  .authenticate()
   .then(() => console.log("db connected"))
   .catch((err) => console.warn(err));
 
 app.listen(process.env.PORT || 4000, () => {
-  console.log("running");
+  console.log(`running on ${process.env.PORT || 4000}`);
 });
