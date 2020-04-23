@@ -1,9 +1,9 @@
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize("gok", "root", "poiqwe123098", {
-  host: "localhost",
+const sequelize = new Sequelize(process.env.dbname, process.env.dbusername, process.env.dbpassword, {
+  host: process.env.hostname,
   dialect: "mysql",
-  logging: false,
 });
+
 const {GroupDataSchema} = require('./models/migrant');
 
 const csv = require('csv-parser');

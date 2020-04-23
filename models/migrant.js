@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('gok', 'root', 'poiqwe123098', {
-  host: 'localhost',
-  dialect: 'mysql'
+const sequelize = new Sequelize(process.env.dbname, process.env.dbusername, process.env.dbpassword, {
+  host: process.env.hostname,
+  dialect: "mysql",
 });
 
 const GroupDataSchema = sequelize.define('groupData', {
