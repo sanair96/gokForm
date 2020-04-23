@@ -34,13 +34,13 @@ function App() {
   return (
     <Provider store={store}>
       <Router history={history}>
-        <PrivateRoute exact path="/">
+        <PrivateRoute exact path="/newgokform">
           <AvailableForms />
         </PrivateRoute>
-        <PrivateRoute exact path="/individualdata" component={FormContainer} />
-        <PrivateRoute exact path='/groupdata' component={HeatMapForm}/>
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/validate" component={ValidateOtp} />
+        <PrivateRoute exact path="/newgokform/individualdata" component={FormContainer} />
+        <PrivateRoute exact path='/newgokform/groupdata' component={HeatMapForm}/>
+        <Route exact path="/newgokform/login" component={Login} />
+        <Route exact path="/newgokform/validate" component={ValidateOtp} />
       </Router>
     </Provider>
   );
