@@ -41,13 +41,13 @@ const AvailableForms = (props) => {
       </AppBar>
       <Grid alignItems="center">
         <List>
-          <ListItemLink href="/groupdata">
+          <ListItemLink href="/newgokform/groupdata">
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
             <ListItemText>Group Data collection</ListItemText>
           </ListItemLink>
-          <ListItemLink href="/individualdata">
+          <ListItemLink href="/newgokform/individualdata">
             <ListItemIcon>
               <FaceIcon />
             </ListItemIcon>
