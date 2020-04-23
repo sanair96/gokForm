@@ -2,6 +2,7 @@
   "name": "gokform",
   "version": "1.0.0",
   "main": "index.js",
+  "homepage": "https://learn.wurkwell.com/newgokform",
   "repository": "git@github.com:anmolmalik97/gokForm.git",
   "author": "Anmol Malik <anmolmalik97new@gmail.com>",
   "license": "MIT",
